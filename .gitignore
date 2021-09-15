@@ -1,0 +1,17 @@
+# Distribution / packaging
+.Python
+venv/
+build/
+test.py
+__pycache__
+output*
+Requirements*
+training_checkpoints
+test/
+result1/
+original/
+generated/
+__pycache__/cifar_lib.cpython-37.pyc
+gan/
+gan1/
+gan2/
