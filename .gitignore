@@ -12,6 +12,6 @@ result1/
 original/
 generated/
 __pycache__/cifar_lib.cpython-37.pyc
-gan/
-gan1/
-gan2/
+checkpoint_dir/
+gan_local/
+gan_remote1/
