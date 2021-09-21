@@ -24,14 +24,27 @@ from tensorflow.data import Dataset
 import time
 
 import matplotlib.pyplot as plt
+import argparse
 
+from datetime import date
 
+today = date.today()
+
+# ARGUMENTPARSER
+parser = argparse.ArgumentParser()
+
+parser.add_argument("-n_samples", help = "Number of samples", type=int)
+parser.add_argument("-latent_dim", help = "Latent size", type=int)
+# Read arguments from command line
+args = parser.parse_args()
+
+str(today)
 
 # Directories
-saved_image_dir = "gan_local2/"
-checkpoint_dir = "checkpoints2"
-saved_weights_dir = "saved_model_weights2/"
-complete_saved_model_dir = "complete_saved_model2"
+saved_image_dir = "gan_local_{}/".format(today)
+checkpoint_dir = "checkpoints_{}".format(today)
+saved_weights_dir = "saved_model_weights_{}/".format(today)
+complete_saved_model_dir = "complete_saved_model_{}".format(today)
 
 def timer(func):
 
@@ -397,8 +410,8 @@ def main():
     
     
     # Train
-    # train(dataset, epochs, batch_size, z_noise_dim, generator, 
-    #       discriminator, gen_optimiser, disc_optimiser, manager)
+    train(dataset, epochs, batch_size, z_noise_dim, generator, 
+          discriminator, gen_optimiser, disc_optimiser, manager)
 
     # Load
     load_saved_generator_flag = False
