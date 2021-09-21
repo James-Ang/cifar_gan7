@@ -24,21 +24,20 @@ from tensorflow.data import Dataset
 import time
 
 import matplotlib.pyplot as plt
-import argparse
+# import argparse
 
 from datetime import date
 
 today = date.today()
 
-# ARGUMENTPARSER
-parser = argparse.ArgumentParser()
+# # ARGUMENTPARSER
+# parser = argparse.ArgumentParser()
 
-parser.add_argument("-n_samples", help = "Number of samples", type=int)
-parser.add_argument("-latent_dim", help = "Latent size", type=int)
-# Read arguments from command line
-args = parser.parse_args()
+# parser.add_argument("-n_samples", help = "Number of samples", type=int)
+# parser.add_argument("-latent_dim", help = "Latent size", type=int)
+# # Read arguments from command line
+# args = parser.parse_args()
 
-str(today)
 
 # Directories
 saved_image_dir = "gan_local_{}/".format(today)

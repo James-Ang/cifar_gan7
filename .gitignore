@@ -13,7 +13,9 @@ original/
 generated/
 __pycache__/cifar_lib.cpython-37.pyc
 gan_local*/
-gan_remote1/
 checkpoints*/
 complete_saved*/
 saved_model*/
+*.err
+*.out
+*remote*/
