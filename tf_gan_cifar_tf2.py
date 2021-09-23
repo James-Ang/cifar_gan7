@@ -27,22 +27,15 @@ from absl import app
 from absl import flags
 
 import matplotlib.pyplot as plt
-from datetime import date
+# from datetime import date
 
 
 FLAGS = flags.FLAGS
 # FLAGS = tf.app.FLAGS
 
-flags.DEFINE_integer('epoch', 4, 'Epoch number.', lower_bound=0, upper_bound=500)
+flags.DEFINE_integer('epoch', 1, 'Epoch number.', lower_bound=0, upper_bound=500)
+flags.DEFINE_integer('filenum', 5, 'File number.')
 
-
-
-# Directories
-today = date.today()
-saved_image_dir = "saved_images_local_{}/".format(today)
-checkpoint_dir = "checkpoints_{}".format(today)
-saved_weights_dir = "saved_model_weights_{}/".format(today)
-complete_saved_model_dir = "complete_saved_model_{}".format(today)
 
 def timer(func):
 
@@ -233,9 +226,11 @@ def train_step(batch_size, z_noise_dim, real_images, generator, discriminator, g
     disc_optimiser.apply_gradients(zip(disc_gradient, discriminator.trainable_variables))
 
 
-def train(dataset, epochs, batch_size, z_noise_dim, generator, discriminator, gen_optimiser, disc_optimiser, manager):
-
-
+def train(dataset, epochs, batch_size, z_noise_dim, generator, discriminator, gen_optimiser, disc_optimiser, manager, saved_image_dir, complete_saved_model_dir):
+    
+    # filenum = FLAGS.filenum
+    # complete_saved_model_dir = "complete_saved_model_{}".format(filenum)
+    
     for epoch in range(epochs):
 
         start_time = time.time()
@@ -244,7 +239,7 @@ def train(dataset, epochs, batch_size, z_noise_dim, generator, discriminator, ge
         i = 1
         for real_images in dataset:
             
-            print("Image Batch {}".format(i))
+            # print("Image Batch {}".format(i))
             
             train_step(batch_size, z_noise_dim, real_images, generator, discriminator, gen_optimiser, disc_optimiser)
             
@@ -254,7 +249,7 @@ def train(dataset, epochs, batch_size, z_noise_dim, generator, discriminator, ge
 
         print("Time for epoch {} is {}." .format(epoch + 1, time.time() - start_time))
 
-        generate_and_save_images(generator, epoch, z_noise_dim)
+        generate_and_save_images(generator, epoch, z_noise_dim, saved_image_dir)
 
         if not epoch%2:
             # https://www.tensorflow.org/api_docs/python/tf/train/Checkpoint
@@ -267,10 +262,12 @@ def train(dataset, epochs, batch_size, z_noise_dim, generator, discriminator, ge
     generator.save(complete_saved_model_dir)
     
     # OR SAVE WEIGHTS ONLY
-    generator.save_weights(saved_weights_dir)
+    # generator.save_weights(saved_weights_dir)
 
 def load_saved_generator(z_noise_dim, checkpoint, generator):
 
+    
+    
     # LOAD ENTIRE MODEL - SAVED MODEL
     # https://www.tensorflow.org/guide/keras/save_and_serialize
     # generator = tf.keras.models.load_model(checkpoint_dir + "singlepoint", compile=False)
@@ -289,11 +286,14 @@ def load_saved_generator(z_noise_dim, checkpoint, generator):
         plt.imshow(c.astype('uint8'))
         # plt.imshow(predictions[i, :, :, :] * 127.5 + 127.5)
         plt.axis('off')
-    # generate_and_save_images(generator, epoch, z_noise_dim)
+    # generate_and_save_images(generator, epoch, z_noise_dim, saved_image_dir)
 
 
 # GENERATE AND SAVE IMAGES
-def generate_and_save_images(model, epoch, z_noise_dim):
+def generate_and_save_images(model, epoch, z_noise_dim, saved_image_dir):
+    
+    # filenum = FLAGS.filenum
+    # saved_image_dir = "saved_images_local_{}/".format(filenum)    
 
     num_examples_to_generate = 16
     seed = tf.random.normal([num_examples_to_generate, z_noise_dim]) # TensorShape([16, 100])
@@ -319,14 +319,29 @@ def generate_and_save_images(model, epoch, z_noise_dim):
         print('Saved Image directory exists')
 
     else:
-        os.mkdir(saved_image_dir)
+        import pathlib
+        pathlib.Path(saved_image_dir).mkdir(parents=True, exist_ok=True) 
+        # os.mkdir(saved_image_dir)
 
     plt.savefig('{}/image_at_epoch_{:04d}.png'.format(saved_image_dir,epoch))
-    # plt.close()
+    plt.close()
 
 
 
 def main(argv):
+    
+    # FLAGS
+    epochs = FLAGS.epoch
+    print ("Epoch: {}".format(epochs))
+    filenum = FLAGS.filenum
+    
+    # Directories
+    
+    saved_image_dir = "saved_images/saved_images_local_{}/".format(filenum)
+    checkpoint_dir = "saved_checkpoints/checkpoints_{}".format(filenum)
+    # saved_weights_dir = "saved_model_weights_{}/".format(filenum)
+    complete_saved_model_dir = "complete_saved_models/model_{}".format(filenum)
+    
     
     # Import Data--------------------------------------------------------------------
 
@@ -351,9 +366,7 @@ def main(argv):
     X_train = (X_train - 127.5) / 127.5
 
     # BATCH AND SHUFFLE THE DATA---------------------------------------------------------
-    epoch = FLAGS.epoch
-    print ("Epoch: {}".format(epoch))
-    # epochs = 10
+    
     batch_size = 256
     z_noise_dim = 100
     buffer_size = len(X_train) # Used for Shuffling.
@@ -409,8 +422,9 @@ def main(argv):
     
     
     # # Train
-    # train(dataset, epochs, batch_size, z_noise_dim, generator, 
-    #       discriminator, gen_optimiser, disc_optimiser, manager)
+    train(dataset, epochs, batch_size, z_noise_dim, generator, 
+          discriminator, gen_optimiser, disc_optimiser, manager, saved_image_dir,
+          complete_saved_model_dir)
 
     # Load
     load_saved_generator_flag = False
@@ -419,9 +433,9 @@ def main(argv):
         
         # 1. Load from SAVED WEIGHTS
 
-        if os.path.exists(saved_weights_dir):
+        # if os.path.exists(saved_weights_dir):
         
-            generator.load_weights(saved_weights_dir)
+        #     generator.load_weights(saved_weights_dir)
         
         # 2. Load from SAVED MODEL - OKAY
         generator = tf.keras.models.load_model(complete_saved_model_dir, compile = False)
