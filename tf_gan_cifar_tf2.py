@@ -12,6 +12,7 @@ https://www.pyimagesearch.com/2019/10/21/keras-vs-tf-keras-whats-the-difference-
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
+import time
 import numpy as np
 import tensorflow as tf
 # from os import path
@@ -21,26 +22,24 @@ from tensorflow.keras.layers import Input, Dense, Dropout, BatchNormalization, L
     Conv2DTranspose, Conv2D, Reshape, Flatten
 from tensorflow.keras.losses import BinaryCrossentropy
 from tensorflow.data import Dataset
-import time
+
+from absl import app
+from absl import flags
 
 import matplotlib.pyplot as plt
-# import argparse
-
 from datetime import date
 
-today = date.today()
 
-# # ARGUMENTPARSER
-# parser = argparse.ArgumentParser()
+FLAGS = flags.FLAGS
+# FLAGS = tf.app.FLAGS
 
-# parser.add_argument("-n_samples", help = "Number of samples", type=int)
-# parser.add_argument("-latent_dim", help = "Latent size", type=int)
-# # Read arguments from command line
-# args = parser.parse_args()
+flags.DEFINE_integer('epoch', 4, 'Epoch number.', lower_bound=0, upper_bound=500)
+
 
 
 # Directories
-saved_image_dir = "gan_local_{}/".format(today)
+today = date.today()
+saved_image_dir = "saved_images_local_{}/".format(today)
 checkpoint_dir = "checkpoints_{}".format(today)
 saved_weights_dir = "saved_model_weights_{}/".format(today)
 complete_saved_model_dir = "complete_saved_model_{}".format(today)
@@ -327,8 +326,8 @@ def generate_and_save_images(model, epoch, z_noise_dim):
 
 
 
-def main():
-
+def main(argv):
+    
     # Import Data--------------------------------------------------------------------
 
     cifar10 = tf.keras.datasets.cifar10
@@ -352,8 +351,9 @@ def main():
     X_train = (X_train - 127.5) / 127.5
 
     # BATCH AND SHUFFLE THE DATA---------------------------------------------------------
-
-    epochs = 10
+    epoch = FLAGS.epoch
+    print ("Epoch: {}".format(epoch))
+    # epochs = 10
     batch_size = 256
     z_noise_dim = 100
     buffer_size = len(X_train) # Used for Shuffling.
@@ -408,9 +408,9 @@ def main():
     manager = tf.train.CheckpointManager(checkpoint, checkpoint_dir, max_to_keep = 3,checkpoint_name='james')
     
     
-    # Train
-    train(dataset, epochs, batch_size, z_noise_dim, generator, 
-          discriminator, gen_optimiser, disc_optimiser, manager)
+    # # Train
+    # train(dataset, epochs, batch_size, z_noise_dim, generator, 
+    #       discriminator, gen_optimiser, disc_optimiser, manager)
 
     # Load
     load_saved_generator_flag = False
@@ -434,4 +434,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    app.run(main)
+

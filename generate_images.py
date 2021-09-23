@@ -2,11 +2,13 @@
 
 import sys
 import argparse
+
 from tensorflow.keras.models import load_model
 
 from cifar_lib import generate_latent_points, scale_images, calculate_fid
 
 from datetime import date
+
 
 today = date.today()
 
@@ -20,6 +22,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("-n_samples", help = "Number of samples", type=int)
 parser.add_argument("-latent_dim", help = "Latent size", type=int)
+# parser.add_argument("-filename", help = "Saved Model Directory.", type=str)
 # Read arguments from command line
 args = parser.parse_args()
 
@@ -28,17 +31,27 @@ latent_dim = 100
 n_samples = 10
 # latent_dim = args.latent_dim
 # n_samples = args.n_samples
+# filename = args.filename
 print(latent_dim), print(n_samples)
+# print(filename)
+
 print('INITIALISATION FOR GENERATOR')
 
+
+
 # LOAD TRAINED GENERATOR
+
+complete_saved_model_dir = "complete_saved_model_remote_2021-09-21"#.format(today)
 # compile means "prepare for training". Since we're not training, so can put to false.
 if sys.platform == "win32":
     # model = load_model(r'C:\Users\User\Documents\virtual\cifar_dcgan5\result1\generator_model_200.h5',compile=False)
-    complete_saved_model_dir = "complete_saved_model_{}".format(today)
+    # complete_saved_model_dir = "complete_saved_model_remote_{}".format(today)
+    
     model = load_model(complete_saved_model_dir, compile = False)
     print('LOAD TRAINED GENERATOR')
+
 else:
+
     model = load_model(complete_saved_model_dir, compile = False)
     print('no')
 
@@ -77,9 +90,9 @@ print('RESIZE IMAGES')
 ## Calculate FID #########################################
 # USING KERAS TO CALCULATE FID ON REAL IMAGES
 from numpy.random import shuffle
-from keras.datasets.cifar10 import load_data
-from keras.applications.inception_v3 import InceptionV3
-from keras.applications.inception_v3 import preprocess_input
+from tensorflow.keras.datasets.cifar10 import load_data
+from tensorflow.keras.applications.inception_v3 import InceptionV3
+from tensorflow.keras.applications.inception_v3 import preprocess_input
 
 
 # LOAD INCEPTION MODEL

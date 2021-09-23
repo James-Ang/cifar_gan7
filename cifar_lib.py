@@ -1,16 +1,11 @@
 # example of defining the discriminator model
 
-from keras.datasets.cifar10 import load_data
-from keras.models import Sequential
-# from keras.optimizers import Adam
-from keras.layers import Dense
-from keras.layers import Conv2D
-from keras.layers import Flatten
-from keras.layers import Dropout
-from keras.layers import LeakyReLU
-from keras.optimizers import Adam
-import matplotlib.pyplot as plt
+from tensorflow.keras.datasets.cifar10 import load_data
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.layers import Dense,Conv2D, Flatten, Dropout, LeakyReLU
 
+from matplotlib import pyplot
 
 # define the standalone discriminator model
 def define_discriminator(in_shape=(32,32,3)):
@@ -49,7 +44,7 @@ def load_real_samples():
 	X = (X - 127.5) / 127.5
 	return X
 
-#from numpy import expand_dims
+from numpy import expand_dims
 from numpy import ones
 from numpy import zeros
 from numpy.random import rand
@@ -95,8 +90,7 @@ def train_discriminator(model, dataset, n_iter=20, n_batch=128):
 		print('>%d real=%.0f%% fake=%.0f%%' % (i+1, real_acc*100, fake_acc*100))
 
 
-from keras.layers import Reshape
-from keras.layers import Conv2DTranspose
+from tensorflow.keras.layers import Reshape, Conv2DTranspose
 from numpy.random import randn
 
 # define the standalone generator model
@@ -162,15 +156,15 @@ def save_plot(examples, epoch, n=7):
 	# plot images
 	for i in range(n * n):
 		# define subplot
-		plt.subplot(n, n, 1 + i)
+		pyplot.subplot(n, n, 1 + i)
 		# turn off axis
-		plt.axis('off')
+		pyplot.axis('off')
 		# plot raw pixel data
-		plt.imshow(examples[i])
+		pyplot.imshow(examples[i])
 	# save plot to file
 	filename = 'generated_plot_e%03d.png' % (epoch+1)
-	plt.savefig(filename)
-	plt.close()
+	pyplot.savefig(filename)
+	pyplot.close()
 
 # evaluate the discriminator, plot generated images, save generator model
 def summarize_performance(epoch, g_model, d_model, dataset, latent_dim, n_samples=150):
@@ -224,9 +218,9 @@ import numpy
 from numpy import cov
 from numpy import trace
 from numpy import asarray
-# from numpy.random import randint
+from numpy.random import randint
 from numpy import iscomplexobj
-# from numpy.random import random
+from numpy.random import random
 from scipy.linalg import sqrtm
 
 # calculate frechet inception distance
@@ -279,15 +273,15 @@ def calculate_fid(model, images1, images2):
 # plot the generated images
 def create_plot(examples, n):
 	# plot images
-	plt.figure(figsize=(15,15))
+	pyplot.figure(figsize=(15,15))
 	for i in range(n * n):
 		# define subplot
-		plt.subplot(n, n, 1 + i)
+		pyplot.subplot(n, n, 1 + i)
 		# turn off axis
-		plt.axis('off')
+		pyplot.axis('off')
 		# plot raw pixel data
-		plt.imshow(examples[i, :, :])
-	plt.show()
+		pyplot.imshow(examples[i, :, :])
+	pyplot.show()
 
 def save_generated_image(X):
 	# X.min(), X.max()
@@ -297,23 +291,10 @@ def save_generated_image(X):
 
 	for i in range(len(Y)):
 
-	    plt.imsave(f'test/generated{i}.jpg',Y[i])
-
-
+	    pyplot.imsave(f'test/generated{i}.jpg',Y[i])
 
 def save_original_image(images1):
 
 	for i in range(len(images1)):
 
 	    plt.imsave(f'original/cifar_ori{i}.jpg',images1[i])
-
-# from tensorflow.python.client import device_lib
-import tensorflow as tf
-
-def cpu_or_gpu():
-    
-    # print(device_lib.list_local_devices())
-    
-    
-    physical_devices = tf.config.list_physical_devices('GPU')
-    print(physical_devices)

@@ -19,3 +19,4 @@ saved_model*/
 *.err
 *.out
 *remote*/
+*.bat
